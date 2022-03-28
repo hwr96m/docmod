@@ -1,0 +1,9 @@
+{		
+	"Site":{
+		"IP":"localhost",
+		"Port":"8811"
+	},
+	"Src":[	
+			{"Name": "GO", "Dir": "E:\\GoLang\\src", "Ext":[".go", ".json", ".txt", ".html", ".htm", ".js", ".css"]}
+		]
+}

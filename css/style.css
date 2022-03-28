@@ -1,0 +1,23 @@
+
+ /* ---------------- The sidebar menu -------------------- */
+.sidenav {
+    height: 90%; /* Full-height: remove this if you want "auto" height */
+    width: 25%; /* Set the width of the sidebar */
+    position: absolute; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 30; /* Stay at the top */
+    left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+	display: fixed;
+}
+ /* ---------------- main menu -------------------- */
+.main {
+	display: block;
+	position:relative;
+	left: 25%;
+	margin: 5px;
+	width: 75%;
+/*	min-width: 500px;*/
+	/*max-width: 800px;*/
+}

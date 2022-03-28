@@ -1,0 +1,20 @@
+{{define "main"}}
+<html>
+<head>
+	{{template "head"}}	
+</head>
+<body>	
+	
+	{{template "sidenav"}}	
+	
+<select id="hlstyle" size="1" onchange="SetStyle();">
+</select><br>
+  <div id='div1' class="main">
+  </div>  
+	
+</body>
+<script>  
+	Init();
+</script>
+</html>
+{{end}}
