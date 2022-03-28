@@ -3,5 +3,5 @@
 /!Build.bat
 /!Run.bat
 /*.code-workspace
-\\settings.json
+/settings.json
 /.gitignore
