@@ -22,8 +22,6 @@ var (
 	err           error
 	post_template = template.Must(template.ParseFiles(
 		"html/main.html",
-		"html/info.html",
-		"html/opendir.html",
 		"html/templates.html"))
 	settings *settings_t
 )
@@ -83,7 +81,7 @@ func page_GetDirs(w http.ResponseWriter, r *http.Request) {
 func page_GetHLStyles(w http.ResponseWriter, r *http.Request) {
 	//json, _ := json.Marshal(dirs)
 	var css []string
-	var path = filepath.Join("css", "highlighter")
+	var path = filepath.Join("lib", "highlight", "styles")
 	filepath.Walk(path, func(p string, info fs.FileInfo, err error) error { // перебор файлов в каталоге
 		if !info.IsDir() && filepath.Ext(p) == ".css" { // берём только файлы css
 			css = append(css, p)
