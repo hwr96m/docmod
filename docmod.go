@@ -220,5 +220,5 @@ func main() {
 	http.Handle("/SetImage/", http.StripPrefix("/SetImage/", http.FileServer(http.Dir("./SetImage"))))
 
 	fmt.Printf("WebServer is listening, port: %s\n", settings.Site.Port)
-	http.ListenAndServe(fmt.Sprintf(":%s", settings.Site.Port), nil)
+	http.ListenAndServeTLS(fmt.Sprintf(":%s", settings.Site.Port), "./ssl/domain.crt", "./ssl/private.key", nil)
 }
