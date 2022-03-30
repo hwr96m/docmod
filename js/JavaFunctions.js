@@ -22,6 +22,7 @@ function InitJSTree(js){
 function GetDirs() {		
 	let formData = new FormData();
     let xhr = new XMLHttpRequest();
+	formData.append("command", "GetTree"); 
     xhr.open("POST", "/info");    
     xhr.send(formData);   
     xhr.onreadystatechange = function() { 					// Ждём ответа от сервера
@@ -40,8 +41,9 @@ function GetContent(path) {				// открываем файлы из дирек�
 	//alert(d);
 	var formData = new FormData();
 	formData.append("path", path); 
+	formData.append("command", "GetContent"); 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/getcontent");    
+    xhr.open("POST", "/info");    
     xhr.send(formData);   
     xhr.onreadystatechange = function() { 					// Ждём ответа от сервера
 	    if (xhr.readyState == 4){ 							// возвращает текущее состояние объекта(0-4)			
@@ -82,7 +84,8 @@ function GetHLStyles() {			// загружает список стилей highl
 	var formData = new FormData();
     var xhr = new XMLHttpRequest();
 	var json
-    xhr.open("POST", "/gethlstyles");    
+	formData.append("command", "GetHLStyles"); 
+    xhr.open("POST", "/info");    
     xhr.send(formData);   
     xhr.onreadystatechange = function() { 					// Ждём ответа от сервера
 	    if (xhr.readyState == 4){ 							// возвращает текущее состояние объекта(0-4)			

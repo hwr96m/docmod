@@ -6,3 +6,4 @@
 /settings.json
 /.gitignore
 /ssl
+/LocalCryptoDB.session.sql

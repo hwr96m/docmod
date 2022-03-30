@@ -59,101 +59,103 @@ func page_main(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(500), 500)
 	}
 }
-func page_GetDirs(w http.ResponseWriter, r *http.Request) {
-	dirs := new([]tree_t)
-	for _, v := range settings.Src { //перебираем все источники из settings
-		var d tree_t
-		d.Name = filepath.Base(v.Name)
-		d.Path = v.Dir
-		d.IsDir = true
-		d.State = "{\"opened\": false}"
-		d.Icon = ""
-		d.Children = DirList(filepath.Join(v.Dir)) // поиск в папке
-		*dirs = append(*dirs, d)
-	}
-	js, _ := json.Marshal(dirs)
-	_, err := w.Write(js)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, http.StatusText(500), 500)
-	}
-}
-func page_GetHLStyles(w http.ResponseWriter, r *http.Request) {
-	//json, _ := json.Marshal(dirs)
-	var css []string
-	var path = filepath.Join("lib", "highlight", "styles")
-	filepath.Walk(path, func(p string, info fs.FileInfo, err error) error { // перебор файлов в каталоге
-		if !info.IsDir() && filepath.Ext(p) == ".css" { // берём только файлы css
-			css = append(css, p)
+func page_Info(w http.ResponseWriter, r *http.Request) {
+	switch r.FormValue("command") {
+	case "GetTree":
+		dirs := new([]tree_t)
+		for _, v := range settings.Src { //перебираем все источники из settings
+			var d tree_t
+			d.Name = filepath.Base(v.Name)
+			d.Path = v.Dir
+			d.IsDir = true
+			d.State = "{\"opened\": false}"
+			d.Icon = ""
+			d.Children = DirList(filepath.Join(v.Dir)) // поиск в папке
+			*dirs = append(*dirs, d)
 		}
-		return nil
-	})
-	json, _ := json.Marshal(css)
-	_, err = w.Write(json)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, http.StatusText(500), 500)
-	}
-}
-func page_GetContent(w http.ResponseWriter, r *http.Request) {
-	type file_t struct {
-		Name string
-		Body string
-	}
-	type vars_t struct {
-		Path  string
-		Files []file_t
-	}
-	var (
-		vars vars_t
-		p    []string // path array
-		path = r.FormValue("path")
-	)
-	path = strings.ReplaceAll(path, "/", string(os.PathSeparator)) // меняем разделители в строке на те, что в ОС
-	p = strings.Split(path, string(os.PathSeparator))              // разделяем путь по разделителю текущей ОС
-	for _, v := range settings.Src {                               // вместо псевдонима подставляем полный путь
-		if v.Name == p[0] {
-			path = filepath.Join(v.Dir, filepath.Join(p[1:]...)) // объединяем пути
-			break
+		js, _ := json.Marshal(dirs)
+		_, err := w.Write(js)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, http.StatusText(500), 500)
 		}
-	}
-	filepath.Walk(path, func(p string, info fs.FileInfo, err error) error { // перебор файлов в каталоге
-		if (path == p) && !info.IsDir() { // берём только путь равный исходному и проверяем IsDir
-			path = filepath.Dir(p)
+	case "GetContent":
+		type file_t struct {
+			Name string
+			Body string
 		}
-		return nil
-	})
-	for _, s := range settings.Src {
-		if strings.Contains(path, s.Dir) {
-			vars.Path = strings.ReplaceAll(path, s.Dir, s.Name) //заменяем путь к каталогу на псевдоним
-		} else {
-			continue
+		type vars_t struct {
+			Path  string
+			Files []file_t
 		}
-		for _, e := range s.Ext { //перебор списка расширений
-			d, err := ioutil.ReadDir(path) //чтение всех файлов и директорий в path
-			if err != nil {
-				fmt.Println(err)
+		var (
+			vars vars_t
+			p    []string // path array
+			path = r.FormValue("path")
+		)
+		path = strings.ReplaceAll(path, "/", string(os.PathSeparator)) // меняем разделители в строке на те, что в ОС
+		p = strings.Split(path, string(os.PathSeparator))              // разделяем путь по разделителю текущей ОС
+		for _, v := range settings.Src {                               // вместо псевдонима подставляем полный путь
+			if v.Name == p[0] {
+				path = filepath.Join(v.Dir, filepath.Join(p[1:]...)) // объединяем пути
+				break
+			}
+		}
+		filepath.Walk(path, func(p string, info fs.FileInfo, err error) error { // перебор файлов в каталоге
+			if (path == p) && !info.IsDir() { // берём только путь равный исходному и проверяем IsDir
+				path = filepath.Dir(p)
+			}
+			return nil
+		})
+		for _, s := range settings.Src {
+			if strings.Contains(path, s.Dir) {
+				vars.Path = strings.ReplaceAll(path, s.Dir, s.Name) //заменяем путь к каталогу на псевдоним
+			} else {
 				continue
 			}
-			for _, f := range d {
-				if (e == filepath.Ext(f.Name())) && !f.IsDir() { // если совпадает расширение и неПапка
-					data, err := ioutil.ReadFile(filepath.Join(path, f.Name())) // чтение файла
-					if err != nil {
-						fmt.Println(err)
-						continue
+			for _, e := range s.Ext { //перебор списка расширений
+				d, err := ioutil.ReadDir(path) //чтение всех файлов и директорий в path
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+				for _, f := range d {
+					if (e == filepath.Ext(f.Name())) && !f.IsDir() { // если совпадает расширение и неПапка
+						data, err := ioutil.ReadFile(filepath.Join(path, f.Name())) // чтение файла
+						if err != nil {
+							fmt.Println(err)
+							continue
+						}
+						vars.Files = append(vars.Files, file_t{f.Name(), string(data)}) // добавляем
 					}
-					vars.Files = append(vars.Files, file_t{f.Name(), string(data)}) // добавляем
 				}
 			}
 		}
-	}
-	if len(vars.Files) == 0 {
-		vars.Files = append(vars.Files, file_t{"NO FILES", ""})
-	}
-	json, _ := json.Marshal(vars)
-	_, err = w.Write(json)
-	if err != nil {
-		log.Println(err.Error())
+		if len(vars.Files) == 0 {
+			vars.Files = append(vars.Files, file_t{"NO FILES", ""})
+		}
+		json, _ := json.Marshal(vars)
+		_, err = w.Write(json)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, http.StatusText(500), 500)
+		}
+	case "GetHLStyles":
+		var css []string
+		var path = filepath.Join("lib", "highlight", "styles")
+		filepath.Walk(path, func(p string, info fs.FileInfo, err error) error { // перебор файлов в каталоге
+			if !info.IsDir() && filepath.Ext(p) == ".css" { // берём только файлы css
+				css = append(css, p)
+			}
+			return nil
+		})
+		json, _ := json.Marshal(css)
+		_, err = w.Write(json)
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, http.StatusText(500), 500)
+		}
+	default:
 		http.Error(w, http.StatusText(500), 500)
 	}
 }
@@ -209,9 +211,7 @@ func DirList(path string) (dirs *[]tree_t) { // рекурсивно просм�
 func main() {
 	settings = settings_init("settings.json") //парсим конфиг файл
 	http.HandleFunc("/", page_main)
-	http.HandleFunc("/info", page_GetDirs)
-	http.HandleFunc("/getcontent", page_GetContent)
-	http.HandleFunc("/gethlstyles", page_GetHLStyles)
+	http.HandleFunc("/info", page_Info)
 
 	http.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.Dir("./lib"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))

@@ -6,7 +6,8 @@
 	"Src":[	
 
 		
-		{"Name": "GO", "Dir": "E:\\Микроконтроллеры\\Справка\\Golang\\src", "Ext":[".go", ".json", ".txt", ".html", ".htm", ".js", ".css"]},
-		{"Name": "PostgreSQL", "Dir": "E:\\Микроконтроллеры\\Справка\\PostgreSQL\\test_prj", "Ext":[".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css"]}
+		{"Name": "GO", "Dir": "E:\\Микроконтроллеры\\Справка\\Golang\\src", "Ext":[".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
+		{"Name": "PostgreSQL", "Dir": "E:\\Микроконтроллеры\\Справка\\PostgreSQL\\test_prj", "Ext":[".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
+		{"Name": "WEB", "Dir": "E:\\Микроконтроллеры\\Справка\\Web\\DocMod", "Ext":[".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]}
 		]
 }
