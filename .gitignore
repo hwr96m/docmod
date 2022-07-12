@@ -1,9 +1,11 @@
 /*.exe
+/*.exe~
 /!BuildRun.bat
 /!Build.bat
 /!Run.bat
 /*.code-workspace
-/settings.json
 /.gitignore
+/.gitignore.bak
 /ssl
 /LocalCryptoDB.session.sql
+/settings.json
