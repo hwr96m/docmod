@@ -60,7 +60,8 @@ func page_main(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func page_Info(w http.ResponseWriter, r *http.Request) {
-	switch r.FormValue("command") {
+	switch r.FormValue("command") { //получаем комманду от клиента
+	//--- дерево директорий ---
 	case "GetTree":
 		dirs := new([]tree_t)
 		for _, v := range settings.Src { //перебираем все источники из settings
@@ -79,6 +80,7 @@ func page_Info(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			http.Error(w, http.StatusText(500), 500)
 		}
+	//--- контент ---
 	case "GetContent":
 		type file_t struct {
 			Name string
@@ -140,6 +142,7 @@ func page_Info(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 			http.Error(w, http.StatusText(500), 500)
 		}
+	//--- список стилей для подсветки синтаксиса на странице ---
 	case "GetHLStyles":
 		var css []string
 		var path = filepath.Join("lib", "highlight", "styles")
@@ -187,7 +190,7 @@ func DirList(path string) (dirs *[]tree_t) { // рекурсивно просм�
 		}
 	}
 	for _, s := range settings.Src { // затем файлы по перечню расширений
-		if !strings.Contains(path, s.Dir) { //ищем наш источник в settings
+		if !strings.Contains(path, s.Dir) { //ищем наш источник в settings.json
 			continue // пропускаем лишнее
 		}
 		for _, e := range s.Ext {
@@ -210,15 +213,20 @@ func DirList(path string) (dirs *[]tree_t) { // рекурсивно просм�
 //------------ main ------------------------------------------------------------
 func main() {
 	settings = settings_init("settings.json") //парсим конфиг файл
+	//--- обработчики открытия страниц ---
 	http.HandleFunc("/", page_main)
 	http.HandleFunc("/info", page_Info)
-
+	//--- источники ---
 	http.Handle("/lib/", http.StripPrefix("/lib/", http.FileServer(http.Dir("./lib"))))
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./css"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("./js"))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
 	http.Handle("/SetImage/", http.StripPrefix("/SetImage/", http.FileServer(http.Dir("./SetImage"))))
-
+	//--- запуск сервера ---
 	fmt.Printf("WebServer is listening, port: %s\n", settings.Site.Port)
-	http.ListenAndServeTLS(fmt.Sprintf(":%s", settings.Site.Port), "./ssl/domain.crt", "./ssl/private.key", nil)
+	//err = http.ListenAndServeTLS(fmt.Sprintf(":%s", settings.Site.Port), "./ssl/domain.crt", "./ssl/private.key", nil) 		//https
+	err = http.ListenAndServe(fmt.Sprintf(":%s", settings.Site.Port), nil) //http
+	if err != nil {
+		fmt.Println(err)
+	}
 }
