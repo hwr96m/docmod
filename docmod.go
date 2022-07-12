@@ -17,7 +17,12 @@ import (
 	"os"
 )
 
-//------------ Переменные ----------------------------------------------------
+//------------ Переменные, константы ----------------------------------------------------
+const (
+	SettingsFile        = "settings.json"
+	SettingsDefaultFile = "default-settings.json"
+)
+
 var (
 	err           error
 	post_template = template.Must(template.ParseFiles(
@@ -164,12 +169,43 @@ func page_Info(w http.ResponseWriter, r *http.Request) {
 }
 
 //------------ Общие функции ---------------------------------------------------
-func settings_init(f string) (*settings_t, error) {
-	file, _ := os.Open(f)
-	decoder := json.NewDecoder(file)
-	config := new(settings_t)
-	err := decoder.Decode(config)
-	return config, err
+func settings_init(file string) (*settings_t, error) {
+	var (
+		err  error
+		c    = new(settings_t)
+		data []byte
+		f    *os.File
+	)
+	//------------ читаем данные из конфига ----------------------------------------
+	if _, err = os.Stat(file); err == nil { //если файл существует
+		data, err = ioutil.ReadFile(file)
+		if err != nil {
+			return nil, fmt.Errorf("func settings_init(): %s", err)
+		}
+	} else { //файла нет
+		//-------- копируем данные из дефолтного файла, создаём файл конфига --------------
+		if _, err = os.Stat(SettingsDefaultFile); err == nil {
+			data, err = ioutil.ReadFile(SettingsDefaultFile)
+			if err != nil {
+				return nil, fmt.Errorf("func settings_init(): %s", err)
+			}
+			f, err = os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0666)
+			if err != nil {
+				return nil, fmt.Errorf("func settings_init(): %s", err)
+			}
+			defer f.Close()
+			f.Write(data)
+		} else {
+			return nil, fmt.Errorf("func settings_init(): %s", err)
+		}
+	}
+	//--------- Заполняем структуру ------------------------
+	err = json.Unmarshal(data, c)
+	if err != nil {
+		return nil, fmt.Errorf("func settings_init(): %s", err)
+	} else {
+		return c, nil
+	}
 }
 func DirList(path string) (dirs *[]tree_t) { // рекурсивно просматривает папки, составляет <ul> список
 	dirs = new([]tree_t)
@@ -212,7 +248,7 @@ func DirList(path string) (dirs *[]tree_t) { // рекурсивно просм�
 
 //------------ main ------------------------------------------------------------
 func main() {
-	settings, err = settings_init("settings.json") //парсим конфиг файл
+	settings, err = settings_init(SettingsFile) //парсим конфиг файл
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -7,7 +7,7 @@
 
 		
 		{"Name": "GO", "Dir": "E:\\Микроконтроллеры\\Справка\\Golang\\src", "Ext":[".go", ".json", ".txt",".py", ".html", ".htm", ".js", ".css", ".sh"]},
-		{"Name": "C#", "Dir": "E:\\Микроконтроллеры\\Справка\\c#\\docmod", "Ext":[".cs",".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
+		{"Name": "C#", "Dir": "E:\\Микроконтроллеры\\Справка\\c#\\doc", "Ext":[".cs",".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
 		{"Name": "PostgreSQL", "Dir": "E:\\Микроконтроллеры\\Справка\\PostgreSQL\\test_prj", "Ext":[".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
 		{"Name": "WEB", "Dir": "E:\\Микроконтроллеры\\Справка\\Web\\DocMod", "Ext":[".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]},
 		{"Name": "Python", "Dir": "E:\\Микроконтроллеры\\Справка\\Python\\docmod", "Ext":[".py",".sql",".psql",".go", ".json", ".txt", ".html", ".htm", ".js", ".css", ".sh"]}
