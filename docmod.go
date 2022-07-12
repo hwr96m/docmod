@@ -164,12 +164,12 @@ func page_Info(w http.ResponseWriter, r *http.Request) {
 }
 
 //------------ Общие функции ---------------------------------------------------
-func settings_init(f string) *settings_t {
+func settings_init(f string) (*settings_t, error) {
 	file, _ := os.Open(f)
 	decoder := json.NewDecoder(file)
 	config := new(settings_t)
-	decoder.Decode(config)
-	return config
+	err := decoder.Decode(config)
+	return config, err
 }
 func DirList(path string) (dirs *[]tree_t) { // рекурсивно просматривает папки, составляет <ul> список
 	dirs = new([]tree_t)
@@ -212,7 +212,11 @@ func DirList(path string) (dirs *[]tree_t) { // рекурсивно просм�
 
 //------------ main ------------------------------------------------------------
 func main() {
-	settings = settings_init("settings.json") //парсим конфиг файл
+	settings, err = settings_init("settings.json") //парсим конфиг файл
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	//--- обработчики открытия страниц ---
 	http.HandleFunc("/", page_main)
 	http.HandleFunc("/info", page_Info)
